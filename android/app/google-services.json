@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1015767430472",
+    "project_id": "healthnut-dd30e",
+    "storage_bucket": "healthnut-dd30e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1015767430472:android:65141f13d22d713bdb2f7d",
+        "android_client_info": {
+          "package_name": "com.cubix.healthnut"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1015767430472-63ss50ijjlbq2hgbujv56hbrvp3cdvn5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoGzcK8_QZVGGqn3lULM2rfk9aAV2IeGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1015767430472-63ss50ijjlbq2hgbujv56hbrvp3cdvn5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
