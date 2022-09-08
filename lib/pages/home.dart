@@ -8,6 +8,7 @@ import 'package:healthnut/shared/loading.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   bool isOnRecords = false;
   bool isOnProfile = false;
   final prefs = SharedPreferences.getInstance();
+
   @override
   Widget build(BuildContext context) {
     Orientation currentOrientation = MediaQuery.of(context).orientation;
@@ -341,6 +343,134 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 25,
+                                        ),
+                                      ),
+                                      const HeightBox(6),
+                                      const Text(
+                                        'Blood Sugar Level',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const HeightBox(6),
+                                      Container(
+                                        height: 200,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              3, 3, 3, 3),
+                                          child: LineChart(
+                                            LineChartData(
+                                              minX: 0,
+                                              maxX: 11,
+                                              minY: 0,
+                                              maxY: 6,
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: [
+                                                    const FlSpot(0, 3),
+                                                    const FlSpot(2.6, 2),
+                                                    const FlSpot(4.9, 5),
+                                                    const FlSpot(6.8, 2.5),
+                                                    const FlSpot(8, 4),
+                                                    const FlSpot(9.5, 3),
+                                                    const FlSpot(11, 4),
+                                                  ],
+                                                  isCurved: true,
+                                                  gradient:
+                                                      const LinearGradient(
+                                                    colors: [
+                                                      Color.fromARGB(
+                                                          255, 111, 8, 1),
+                                                      Color.fromARGB(
+                                                          255, 255, 0, 0)
+                                                    ],
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    gradient:
+                                                        const LinearGradient(
+                                                      colors: [
+                                                        Color.fromARGB(
+                                                            126, 111, 8, 1),
+                                                        Color.fromARGB(
+                                                            62, 255, 0, 0)
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const HeightBox(10),
+                                      const Text(
+                                        'Oxygen (SpO2) Level',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const HeightBox(6),
+                                      Container(
+                                        height: 200,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              3, 3, 3, 3),
+                                          child: LineChart(
+                                            LineChartData(
+                                              minX: 0,
+                                              maxX: 11,
+                                              minY: 0,
+                                              maxY: 6,
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: [
+                                                    const FlSpot(0, 3),
+                                                    const FlSpot(2.6, 2),
+                                                    const FlSpot(4.9, 5),
+                                                    const FlSpot(6.8, 2.5),
+                                                    const FlSpot(8, 4),
+                                                    const FlSpot(9.5, 3),
+                                                    const FlSpot(11, 4),
+                                                  ],
+                                                  isCurved: true,
+                                                  gradient:
+                                                      const LinearGradient(
+                                                    colors: [
+                                                      Color.fromARGB(
+                                                          255, 0, 62, 116),
+                                                      Color.fromARGB(
+                                                          255, 0, 150, 224),
+                                                    ],
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    gradient:
+                                                        const LinearGradient(
+                                                      colors: [
+                                                        Color.fromARGB(
+                                                            126, 0, 62, 116),
+                                                        Color.fromARGB(
+                                                            62, 0, 149, 224),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],

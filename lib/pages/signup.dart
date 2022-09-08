@@ -101,21 +101,6 @@ class _SignupPageState extends State<SignupPage> {
                               : null,
                           decoration: InputDecoration(
                             prefixIcon: const Icon(Icons.lock),
-                            suffix: GestureDetector(
-                              child: Icon(
-                                isPwdHidden
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: isPwdHidden
-                                    ? Colors.green
-                                    : Colors.redAccent,
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  isPwdHidden = !isPwdHidden;
-                                });
-                              },
-                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(25.0),
                             ),
@@ -132,21 +117,6 @@ class _SignupPageState extends State<SignupPage> {
                               : null,
                           decoration: InputDecoration(
                             prefixIcon: const Icon(Icons.lock),
-                            suffix: GestureDetector(
-                              child: Icon(
-                                isPwdHidden
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: isPwdHidden
-                                    ? Colors.green
-                                    : Colors.redAccent,
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  isPwdHidden = !isPwdHidden;
-                                });
-                              },
-                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(25.0),
                             ),
