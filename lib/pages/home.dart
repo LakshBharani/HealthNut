@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:healthnut/pages/edit_user_info.dart';
+import 'package:healthnut/pages/emergency_contacts.dart';
 import 'package:healthnut/pages/login.dart';
 import 'package:healthnut/services/auth_service.dart';
 import 'package:healthnut/shared/loading.dart';
@@ -21,10 +22,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController medeName_controller = TextEditingController();
   bool loading = false;
   bool isOnHome = true;
   bool isOnReports = false;
   bool isOnProfile = false;
+  bool isSearching = false;
   int _index = 0;
   Stream<QuerySnapshot> getUpcomingAppointments(
       BuildContext context, String uid) async* {
@@ -132,7 +135,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: isOnHome
+                    child: isOnHome || isSearching
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -151,17 +154,34 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.grey[200],
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                child: const Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 10, 0),
                                   child: TextField(
+                                    controller: medeName_controller,
                                     autocorrect: false,
                                     enableSuggestions: false,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       enabledBorder: InputBorder.none,
                                       focusedBorder: InputBorder.none,
                                       hintText: 'Search Medicine',
                                       prefixIcon: Icon(Icons.search),
                                     ),
+                                    onChanged: (value) {
+                                      value.isNotEmpty
+                                          ? setState(() {
+                                              isOnHome = false;
+                                              isOnReports = false;
+                                              isOnProfile = false;
+                                              isSearching = true;
+                                            })
+                                          : setState(() {
+                                              isOnHome = true;
+                                              isOnReports = false;
+                                              isOnProfile = false;
+                                              isSearching = false;
+                                            });
+                                    },
                                   ),
                                 ),
                               ),
@@ -218,13 +238,15 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         height: isOnHome
                             ? MediaQuery.of(context).size.height - 154
-                            : MediaQuery.of(context).size.height - 104,
+                            : isSearching
+                                ? MediaQuery.of(context).size.height - 154
+                                : MediaQuery.of(context).size.height - 104,
                         width: MediaQuery.of(context).size.width,
                         child: isOnHome
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                child: SingleChildScrollView(
+                            ? SingleChildScrollView(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 20, 20, 0),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
@@ -372,7 +394,14 @@ class _HomePageState extends State<HomePage> {
                                                                   backgroundColor:
                                                                       Colors.orange[
                                                                           500]),
-                                                          onPressed: () {},
+                                                          onPressed: () {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            const EmergencyContactsPage()));
+                                                          },
                                                           child: const Icon(
                                                             Icons.call_rounded,
                                                             size: 30,
@@ -939,7 +968,8 @@ class _HomePageState extends State<HomePage> {
                                 : isOnProfile
                                     ? SingleChildScrollView(
                                         child: Padding(
-                                          padding: const EdgeInsets.all(20),
+                                          padding: const EdgeInsets.fromLTRB(
+                                              20, 10, 20, 20),
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
@@ -1017,7 +1047,7 @@ class _HomePageState extends State<HomePage> {
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                              Text('Laksh Bharani'),
+                                              const Text('Laksh Bharani'),
                                               const HeightBox(15),
                                               const Text(
                                                 'Email ID',
@@ -1163,7 +1193,20 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       )
-                                    : Container(),
+                                    : isSearching
+                                        ? SingleChildScrollView(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(20),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [],
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
                       ),
                       Container(
                         height: 60,
