@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:healthnut/pages/home.dart';
 import 'package:healthnut/pages/login.dart';
@@ -188,6 +190,22 @@ class _SignupPageState extends State<SignupPage> {
                                     setState(() {
                                       loading = false;
                                     });
+                                  });
+                                  FirebaseAuth auth = FirebaseAuth.instance;
+                                  final User? user = auth.currentUser;
+                                  final uid = user!.uid;
+
+                                  FirebaseFirestore.instance
+                                      .collection('user_basic_data')
+                                      .doc(uid)
+                                      .set({
+                                    'uid': uid,
+                                    'name': '',
+                                    'height': 0,
+                                    'weight': 0,
+                                    'gender': 0,
+                                    'pfp': '',
+                                    'email': email_controller.text,
                                   });
                                 }
                               }
