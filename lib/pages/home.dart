@@ -1,7 +1,8 @@
 // ignore_for_file: prefer_final_fields
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:healthnut/pages/edit_user_info.dart';
 import 'package:healthnut/pages/login.dart';
 import 'package:healthnut/services/auth_service.dart';
@@ -24,11 +25,23 @@ class _HomePageState extends State<HomePage> {
   bool isOnHome = true;
   bool isOnReports = false;
   bool isOnProfile = false;
+  int _index = 0;
+  Stream<QuerySnapshot> getUpcomingAppointments(
+      BuildContext context, String uid) async* {
+    yield* FirebaseFirestore.instance
+        .collection('user_basic_data')
+        .doc(uid)
+        .collection('upcoming_appointments')
+        .snapshots();
+  }
+
   final prefs = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
     Orientation currentOrientation = MediaQuery.of(context).orientation;
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
 
     return loading
         ? Loading()
@@ -50,45 +63,29 @@ class _HomePageState extends State<HomePage> {
                           child: CircleAvatar(
                             backgroundColor: Colors.white,
                             radius: 34,
-                            child: Icon(Icons.camera_alt_rounded),
+                            child: Icon(
+                              Icons.person_rounded,
+                              size: 40,
+                            ),
                           ),
                         ),
-                        Positioned(
+                        const Positioned(
                             bottom: 30,
-                            child: Row(
-                              children: const [
-                                Icon(
-                                  Icons.email_rounded,
-                                  color: Colors.white,
-                                ),
-                                WidthBox(10),
-                                Text(
-                                  'laksh.bharani@gmail.com',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                              ],
+                            child: Text(
+                              'Laksh Bharani',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             )),
-                        Positioned(
+                        const Positioned(
                             bottom: 5,
-                            child: Row(
-                              children: const [
-                                Icon(
-                                  Icons.phone_rounded,
-                                  color: Colors.white,
-                                ),
-                                WidthBox(10),
-                                Text(
-                                  '9972644523',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                              ],
+                            child: Text(
+                              'laksh.bharani@gmail.com',
+                              style: TextStyle(color: Colors.white),
                             )),
                         Positioned(
                           right: 0,
+                          top: 0,
                           child: IconButton(
                               splashColor: Colors.white,
                               onPressed: () {
@@ -140,8 +137,9 @@ class _HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               IconButton(
-                                  onPressed: () =>
-                                      _scaffoldKey.currentState?.openDrawer(),
+                                  onPressed: () {
+                                    _scaffoldKey.currentState!.openDrawer();
+                                  },
                                   icon: const Icon(Icons.menu_rounded)),
                               Container(
                                 height: 50,
@@ -211,75 +209,9 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                               ),
-                              // Container(
-                              //   height: 46,
-                              //   width: 46,
-                              //   decoration: const BoxDecoration(
-                              //     color: Colors.red,
-                              //     shape: BoxShape.circle,
-                              //   ),
-                              //   child: IconButton(
-                              //     color: Colors.white,
-                              //     onPressed: () {
-                              //       AlertDialog alert = AlertDialog(
-                              //         title: const Text(
-                              //           "Sign Out",
-                              //           style: TextStyle(
-                              //               fontWeight: FontWeight.bold),
-                              //         ),
-                              //         content: const Text(
-                              //             "Would you like to stay signed in?\nYou will have to login once again if you confirm."),
-                              //         actions: [
-                              //           ElevatedButton(
-                              //               onPressed: () {
-                              //                 Navigator.of(context).pop();
-                              //               },
-                              //               child: const Text('Cancel')),
-                              //           Padding(
-                              //             padding:
-                              //                 const EdgeInsets.only(right: 5),
-                              //             child: ElevatedButton(
-                              //                 onPressed: () {
-                              //                   Navigator.of(context).pop();
-                              //                   setState(() {
-                              //                     loading = true;
-                              //                   });
-                              //                   context
-                              //                       .read<
-                              //                           AuthenticationProvider>()
-                              //                       .signOut()
-                              //                       .then((value) {
-                              //                     Navigator.push(
-                              //                       context,
-                              //                       MaterialPageRoute(
-                              //                           builder: (context) =>
-                              //                               const LoginPage()),
-                              //                     ).then((value) {
-                              //                       setState(() {
-                              //                         loading = false;
-                              //                       });
-                              //                     });
-                              //                   });
-                              //                 },
-                              //                 child: const Text('Confirm')),
-                              //           )
-                              //         ],
-                              //       );
-                              //       showDialog(
-                              //         context: context,
-                              //         builder: (BuildContext context) {
-                              //           return alert;
-                              //         },
-                              //       );
-                              //     },
-                              //     splashRadius: 1,
-                              //     splashColor: Colors.red,
-                              //     icon: const Icon(Icons.logout),
-                              //   ),
-                              // ),
                             ],
                           )
-                        : null,
+                        : Container(),
                   ),
                   Column(
                     children: [
@@ -290,7 +222,8 @@ class _HomePageState extends State<HomePage> {
                         width: MediaQuery.of(context).size.width,
                         child: isOnHome
                             ? Padding(
-                                padding: const EdgeInsets.all(20),
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 20, 20, 0),
                                 child: SingleChildScrollView(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -314,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                                               BorderRadius.circular(15),
                                         ),
                                         padding: const EdgeInsets.fromLTRB(
-                                            20, 12, 20, 5),
+                                            0, 12, 0, 5),
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: Row(
@@ -323,9 +256,8 @@ class _HomePageState extends State<HomePage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 20),
+                                              SizedBox(
+                                                width: 100,
                                                 child: Column(
                                                   children: [
                                                     SizedBox(
@@ -356,9 +288,8 @@ class _HomePageState extends State<HomePage> {
                                                   ],
                                                 ),
                                               ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 20),
+                                              SizedBox(
+                                                width: 100,
                                                 child: Column(
                                                   children: [
                                                     SizedBox(
@@ -389,9 +320,8 @@ class _HomePageState extends State<HomePage> {
                                                   ],
                                                 ),
                                               ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 20),
+                                              SizedBox(
+                                                width: 100,
                                                 child: Column(
                                                   children: [
                                                     SizedBox(
@@ -419,7 +349,7 @@ class _HomePageState extends State<HomePage> {
                                                     ),
                                                     const HeightBox(5),
                                                     const Text(
-                                                      'My\nReports',
+                                                      'My\nDocs',
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: TextStyle(
@@ -429,32 +359,36 @@ class _HomePageState extends State<HomePage> {
                                                   ],
                                                 ),
                                               ),
-                                              Column(
-                                                children: [
-                                                  SizedBox(
-                                                    height: 70,
-                                                    width: 70,
-                                                    child: ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                                backgroundColor:
-                                                                    Colors.orange[
-                                                                        500]),
-                                                        onPressed: () {},
-                                                        child: const Icon(
-                                                          Icons.article_rounded,
-                                                          size: 30,
-                                                        )),
-                                                  ),
-                                                  const HeightBox(5),
-                                                  const Text(
-                                                    'My\nPrescriptions',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
+                                              SizedBox(
+                                                width: 100,
+                                                child: Column(
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 70,
+                                                      width: 70,
+                                                      child: ElevatedButton(
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                                  backgroundColor:
+                                                                      Colors.orange[
+                                                                          500]),
+                                                          onPressed: () {},
+                                                          child: const Icon(
+                                                            Icons.call_rounded,
+                                                            size: 30,
+                                                          )),
+                                                    ),
+                                                    const HeightBox(5),
+                                                    const Text(
+                                                      'Emergency\nContacts',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -462,135 +396,208 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       const HeightBox(20),
                                       const Text(
-                                        'Scheduled',
+                                        'Upcoming',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 25,
                                         ),
                                       ),
-                                      const HeightBox(6),
-                                      Container(
-                                        height: 190,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[200],
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20),
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                left: 0,
-                                                top: 0,
-                                                child: Container(
-                                                  height: 70,
-                                                  width: 70,
-                                                  color: Colors.deepPurple,
-                                                  child: const Icon(
-                                                    Icons.person,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                              const Positioned(
-                                                left: 80,
-                                                top: 0,
-                                                child: Text(
-                                                  'Name',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 80,
-                                                top: 27.5,
-                                                child: ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                      maxWidth:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width -
-                                                              157,
-                                                      maxHeight: 63),
-                                                  child: const Text(
-                                                    "Om Prakash Mishra Singh Bharani (Ph.D.)",
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 5,
-                                                  ),
-                                                ),
-                                              ),
-                                              const Positioned(
-                                                left: 0,
-                                                top: 75,
-                                                child: Text(
-                                                  'Note',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 0,
-                                                top: 105,
-                                                child: ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                      maxWidth:
-                                                          MediaQuery.of(context)
-                                                                      .size
-                                                                      .width /
-                                                                  2 -
-                                                              50,
-                                                      maxHeight: 63),
-                                                  child: const Text(
-                                                    "Carry all prescriptions and file for height and weight",
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 2,
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2,
-                                                top: 75,
-                                                child: const Text(
-                                                  'Date',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2,
-                                                top: 105,
-                                                child: ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                      maxWidth:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width -
-                                                              280,
-                                                      maxHeight: 63),
-                                                  child: const Text(
-                                                    "21st September\n10:30 am",
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 2,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                      const HeightBox(8),
+                                      Center(
+                                        child: SizedBox(
+                                          height: 185,
+                                          child: StreamBuilder(
+                                            stream: getUpcomingAppointments(
+                                                context, uid!),
+                                            builder: (context, snapshot) {
+                                              if (!snapshot.hasData) {
+                                                return const Text("Loading...");
+                                              }
+                                              return PageView.builder(
+                                                itemCount:
+                                                    snapshot.data!.docs.length,
+                                                controller: PageController(
+                                                    viewportFraction: 0.75),
+                                                onPageChanged: (int index) =>
+                                                    setState(
+                                                        () => _index = index),
+                                                itemBuilder: (_, i) {
+                                                  return Transform.scale(
+                                                    scale:
+                                                        i == _index ? 1 : 0.9,
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[200],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20),
+                                                        child: Stack(
+                                                          children: [
+                                                            const Positioned(
+                                                              left: 0,
+                                                              top: 0,
+                                                              child:
+                                                                  CircleAvatar(
+                                                                radius: 35,
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .person_rounded,
+                                                                  size: 40,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                              // Container(
+                                                              //   height: 70,
+                                                              //   width: 70,
+                                                              //   color: Colors
+                                                              //       .deepPurple,
+                                                              //   child:
+                                                              //       const Icon(
+                                                              //     Icons
+                                                              //         .person_rounded,
+                                                              //     size: 40,
+                                                              //     color: Colors
+                                                              //         .white,
+                                                              //   ),
+                                                              // ),
+                                                            ),
+                                                            const Positioned(
+                                                              left: 80,
+                                                              top: 0,
+                                                              child: Text(
+                                                                'Name',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              left: 80,
+                                                              top: 20,
+                                                              child:
+                                                                  ConstrainedBox(
+                                                                constraints: BoxConstraints(
+                                                                    maxWidth: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width -
+                                                                        250,
+                                                                    maxHeight:
+                                                                        63),
+                                                                child: Text(
+                                                                  snapshot
+                                                                      .data!
+                                                                      .docs[i][
+                                                                          'name']
+                                                                      .toString(),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  maxLines: 2,
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          18),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const Positioned(
+                                                              left: 0,
+                                                              top: 75,
+                                                              child: Text(
+                                                                'Date',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              left: 0,
+                                                              top: 95,
+                                                              child:
+                                                                  ConstrainedBox(
+                                                                constraints: BoxConstraints(
+                                                                    maxWidth:
+                                                                        MediaQuery.of(context).size.width /
+                                                                                2 -
+                                                                            100,
+                                                                    maxHeight:
+                                                                        63),
+                                                                child: Text(
+                                                                  snapshot
+                                                                      .data!
+                                                                      .docs[i][
+                                                                          'date_appointment']
+                                                                      .toString(),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  maxLines: 2,
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          18),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const Positioned(
+                                                              right: 0,
+                                                              top: 75,
+                                                              child: Text(
+                                                                'Time',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              right: 0,
+                                                              top: 95,
+                                                              child:
+                                                                  ConstrainedBox(
+                                                                constraints: BoxConstraints(
+                                                                    maxWidth: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width -
+                                                                        280,
+                                                                    maxHeight:
+                                                                        63),
+                                                                child: Text(
+                                                                  snapshot
+                                                                      .data!
+                                                                      .docs[i][
+                                                                          'time']
+                                                                      .toString(),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  maxLines: 2,
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          20),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
                                           ),
                                         ),
                                       ),
@@ -941,8 +948,8 @@ class _HomePageState extends State<HomePage> {
                                             children: [
                                               const Center(
                                                 child: Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      0, 10, 0, 30),
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 30),
                                                   child: Text(
                                                     'My Profile',
                                                     style: TextStyle(
@@ -963,8 +970,10 @@ class _HomePageState extends State<HomePage> {
                                                       radius: 60,
                                                       child: CircleAvatar(
                                                         radius: 58,
-                                                        child: Icon(Icons
-                                                            .camera_alt_rounded),
+                                                        child: Icon(
+                                                          Icons.person_rounded,
+                                                          size: 80,
+                                                        ),
                                                       ),
                                                     ),
                                                     Positioned(
@@ -1008,7 +1017,7 @@ class _HomePageState extends State<HomePage> {
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                              const Text('Laksh Bharani'),
+                                              Text('Laksh Bharani'),
                                               const HeightBox(15),
                                               const Text(
                                                 'Email ID',
@@ -1051,84 +1060,236 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               const Text('72 Kgs'),
                                               const HeightBox(20),
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const EditProfile()));
-                                                },
-                                                child:
-                                                    const Text('Edit Details'),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const EditProfile()));
+                                                    },
+                                                    child: const Text(
+                                                        'Edit Details'),
+                                                  ),
+                                                  ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                    ),
+                                                    onPressed: () {
+                                                      AlertDialog alert =
+                                                          AlertDialog(
+                                                        title: const Text(
+                                                          "Sign Out",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                        content: const Text(
+                                                            "Would you like to stay signed in?\nYou will have to login once again if you confirm."),
+                                                        actions: [
+                                                          ElevatedButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: const Text(
+                                                                  'Cancel')),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    right: 5),
+                                                            child:
+                                                                ElevatedButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                      setState(
+                                                                          () {
+                                                                        loading =
+                                                                            true;
+                                                                      });
+                                                                      context
+                                                                          .read<
+                                                                              AuthenticationProvider>()
+                                                                          .signOut()
+                                                                          .then(
+                                                                              (value) {
+                                                                        Navigator
+                                                                            .push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                              builder: (context) => const LoginPage()),
+                                                                        ).then(
+                                                                            (value) {
+                                                                          setState(
+                                                                              () {
+                                                                            loading =
+                                                                                false;
+                                                                          });
+                                                                        });
+                                                                      });
+                                                                    },
+                                                                    child: const Text(
+                                                                        'Confirm')),
+                                                          )
+                                                        ],
+                                                      );
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return alert;
+                                                        },
+                                                      );
+                                                    },
+                                                    child:
+                                                        const Text('Signout'),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
                                         ),
                                       )
-                                    : null,
+                                    : Container(),
                       ),
                       Container(
                         height: 60,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(15),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(40),
+                            topRight: Radius.circular(40),
+                          ),
                         ),
                         child: ButtonBar(
                           alignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                backgroundColor:
-                                    isOnHome ? Colors.red : Colors.deepPurple,
-                              ),
-                              onPressed: () {
+                            GestureDetector(
+                              onTap: () {
                                 setState(() {
                                   isOnHome = true;
                                   isOnReports = false;
                                   isOnProfile = false;
                                 });
                               },
-                              child: const Icon(Icons.home_rounded),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                height: 43,
+                                width: 65,
+                                color: Colors.white,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.home_rounded,
+                                      color: isOnHome
+                                          ? Colors.deepPurple
+                                          : Colors.black,
+                                    ),
+                                    isOnHome
+                                        ? const Padding(
+                                            padding: EdgeInsets.only(top: 0),
+                                            child: Icon(
+                                              Icons.circle,
+                                              size: 5,
+                                              color: Colors.deepPurple,
+                                            ),
+                                          )
+                                        : Container(
+                                            height: 0,
+                                          )
+                                  ],
                                 ),
-                                backgroundColor: isOnReports
-                                    ? Colors.red
-                                    : Colors.deepPurple,
                               ),
-                              onPressed: () {
+                            ),
+                            GestureDetector(
+                              onTap: () {
                                 setState(() {
                                   isOnHome = false;
                                   isOnReports = true;
                                   isOnProfile = false;
                                 });
                               },
-                              child: const Icon(Icons.book_rounded),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                height: 43,
+                                width: 65,
+                                color: Colors.white,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.book_rounded,
+                                      color: isOnReports
+                                          ? Colors.deepPurple
+                                          : Colors.black,
+                                    ),
+                                    isOnReports
+                                        ? const Padding(
+                                            padding: EdgeInsets.only(top: 1),
+                                            child: Icon(
+                                              Icons.circle,
+                                              size: 5,
+                                              color: Colors.deepPurple,
+                                            ),
+                                          )
+                                        : Container(
+                                            height: 0,
+                                          )
+                                  ],
                                 ),
-                                backgroundColor: isOnProfile
-                                    ? Colors.red
-                                    : Colors.deepPurple,
                               ),
-                              onPressed: () {
+                            ),
+                            GestureDetector(
+                              onTap: () {
                                 setState(() {
                                   isOnHome = false;
                                   isOnReports = false;
                                   isOnProfile = true;
                                 });
                               },
-                              child: const Icon(Icons.person_rounded),
+                              child: Container(
+                                color: Colors.white,
+                                height: 43,
+                                width: 65,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.person_rounded,
+                                      color: isOnProfile
+                                          ? Colors.deepPurple
+                                          : Colors.black,
+                                    ),
+                                    isOnProfile
+                                        ? const Icon(
+                                            Icons.circle,
+                                            size: 5,
+                                            color: Colors.deepPurple,
+                                          )
+                                        : Container(
+                                            height: 0,
+                                          )
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
